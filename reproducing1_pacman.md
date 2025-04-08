@@ -142,7 +142,7 @@ def world():
                 path.dot(2, 'white')
 ```
 
-### 3.square
+### 3.square()
 
 **description:** draw square using path in (x,y)
 
@@ -165,3 +165,102 @@ def square(x, y):
     path.end_fill()
 ```
 
+### move()
+
+**description:** it's used to move Pac-man and all ghosts. In this function, Pac-man's aim and ghosts' positions will be checked whether valid or not, if valid, Pac-man's position will update through keyboard and ghosts' position will update through the recent direction through the ghost list. If invalid, Pac-man will stay the same, but ghosts need change their position randomly in options. By the way, the game needs update frequently, we set up a function to recall *move()* in 100s.
+
+**usage example:**
+
+```python
+def move():
+    """Move pacman and all ghosts."""
+    writer.undo()
+    writer.write(state['score'])
+
+    clear()
+
+    if valid(pacman + aim): #check the aim and position
+        pacman.move(aim)
+
+    index = offset(pacman) # calculate the index on map
+
+    if tiles[index] == 1:
+        tiles[index] = 2
+        state['score'] += 1
+        x = (index % 20) * 20 - 200
+        y = 180 - (index // 20) * 20
+        square(x, y)
+
+    up()
+    goto(pacman.x + 10, pacman.y + 10)
+    dot(20, 'yellow')
+
+    for point, course in ghosts:
+        if valid(point + course):
+            point.move(course)
+        else:
+            options = [
+                vector(5, 0),
+                vector(-5, 0),
+                vector(0, 5),
+                vector(0, -5),
+            ]
+            plan = choice(options)
+            course.x = plan.x
+            course.y = plan.y
+
+        up()
+        goto(point.x + 10, point.y + 10)
+        dot(20, 'red')
+
+    update()#call function in Turtle to update the game window
+
+    for point, course in ghosts:
+        if abs(pacman - point) < 20:
+            return
+
+    ontimer(move, 100)
+```
+
+It's not very difficult to discover, we steal have something uncompleted. They are functions *offset()* and *valid()*, but we have one thing for certain, that *offset()* is building for calculating the index on the map while *valid()* for checking the position is valid or not(is that point on the map?). Then we can start in realize them.
+
+### offset()
+
+**usage example:**
+
+```python
+def offset(point):
+    """Return offset of point in tiles."""
+    x = (floor(point.x, 20) + 200) / 20
+    y = (180 - floor(point.y, 20)) / 20
+    index = int(x + y * 20)
+    return index
+```
+
+point.x is the x-coordinate of the given point, we use floor() to round down point.x to the nearest multiple of 20, +200 can shift the x-coordinate to align with the grids' origin, /20 converts the coordinate into a grid index by dividing by the tile size 20.
+
+point.y has the same method, the only difference is 180- reverses the y-axis to match the grid's indexing(since the grid's origin is at the top-left corner).
+
+### valid()
+
+**usage example:**
+
+```python
+def valid(point):
+    """Return True if point is valid in tiles."""
+    index = offset(point)
+
+    if tiles[index] == 0:#recent position
+        return False
+
+    index = offset(point + 19)
+
+    if tiles[index] == 0:#wall
+        return False
+
+    return point.x % 20 == 0 or point.y % 20 == 0 #grid
+```
+
+it will check a position through walls, grids and recent position, then return a bool variation.
+
+This is the whole code explanation of pacman.py. It's obvious that it can be better through several additions and changes. I'll talk about that in the NEXT PART.
