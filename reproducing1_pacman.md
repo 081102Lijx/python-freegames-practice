@@ -1,5 +1,7 @@
 As the first project in my GitHub, I want to make something interesting but not too difficult. It's not alien for me to comprehend and thumb through such games in python, but it is the absolutely first time to reproduce a total-functioned code. I will write down what I'm thinking and how I  deconstruct  classical projects to do my utmost to enhance my comprehension about coding.
 
+# Comprehension
+
 ## Dependencies
 
 We leverage the following core libraries for system implementation:
@@ -165,7 +167,7 @@ def square(x, y):
     path.end_fill()
 ```
 
-### move()
+### 4.move()
 
 **description:** it's used to move Pac-man and all ghosts. In this function, Pac-man's aim and ghosts' positions will be checked whether valid or not, if valid, Pac-man's position will update through keyboard and ghosts' position will update through the recent direction through the ghost list. If invalid, Pac-man will stay the same, but ghosts need change their position randomly in options. By the way, the game needs update frequently, we set up a function to recall *move()* in 100s.
 
@@ -224,7 +226,7 @@ def move():
 
 It's not very difficult to discover, we steal have something uncompleted. They are functions *offset()* and *valid()*, but we have one thing for certain, that *offset()* is building for calculating the index on the map while *valid()* for checking the position is valid or not(is that point on the map?). Then we can start in realize them.
 
-### offset()
+### 5.offset()
 
 **usage example:**
 
@@ -241,7 +243,7 @@ point.x is the x-coordinate of the given point, we use floor() to round down poi
 
 point.y has the same method, the only difference is 180- reverses the y-axis to match the grid's indexing(since the grid's origin is at the top-left corner).
 
-### valid()
+### 6.valid()
 
 **usage example:**
 
@@ -263,4 +265,32 @@ def valid(point):
 
 it will check a position through walls, grids and recent position, then return a bool variation.
 
-This is the whole code explanation of pacman.py. It's obvious that it can be better through several additions and changes. I'll talk about that in the NEXT PART.
+This is the whole code explanation of pacman.py. It's obvious that it can be better through several additions and changes. I'll talk about that LATER ON.
+
+# additions
+
+## timer and limitations
+
+It's boring to finish every dots every time, it costs a lot of time. In my imagination, making a limitation will put the game in a thrilling condition, every time you open it, you are exciting and ambitious.
+
+## Make the ghosts smarter
+
+In normal life, just imaging, you are chasing someone, willing to catch him/her, what will you do if you think he/she is close enough to you? You will speed up, without any doubt, and so do the ghosts. If the ghost is close enough to the Pac-man, it will speed up to end this game.
+
+First, we need to check the distance between the Pac-man and ghost.
+
+```python
+def distance_close(pacman,ghost):
+    if abs(pacman.x-ghost.x)<200 and abs(pacman.y-ghost.y)<200:
+        return True
+    return False
+```
+
+And call this function in move():
+
+```python
+if distance_close(pacman,ghost):
+    ghost_speed = 30
+```
+
+You can see the ghost will accelerate its speed when close enough to the Pac-man.
